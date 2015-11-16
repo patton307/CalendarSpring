@@ -31,7 +31,9 @@ public class CalendarSpringController {
     @PostConstruct
     public void init() throws InvalidKeySpecException, NoSuchAlgorithmException {
         if (users.count() == 0) {
-            User user = new User("admin", PasswordHash.createHash("admin"));
+            User user = new User();
+            user.username = "admin";
+            user.password = PasswordHash.createHash("admin");
             users.save(user);
         }
 
@@ -76,15 +78,16 @@ public class CalendarSpringController {
         return "redirect:/";
     }
 
-    @RequestMapping("/addevent")
+    @RequestMapping("/add-event")
     public String addEvent(HttpSession session, String description, String date) throws Exception {
-        String username = (String) session.getAttribute("user");
+        String username = (String) session.getAttribute("username");
         if (username == null) {
             throw new Exception("Not logged in.");
         }
 
         Event e = new Event();
         e.date = LocalDateTime.parse(date);
+        e.description = description;
         e.user = users.findOneByUsername(username);
         events.save(e);
 
